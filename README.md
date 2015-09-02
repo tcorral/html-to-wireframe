@@ -17,7 +17,7 @@ so you will get two images per device.
 ### Git
 
 ```bash
-git clone https://github.com/tcorral/url-to-wireframe.git
+$ git clone https://github.com/tcorral/url-to-wireframe.git
 ```
 
 ### Node 
@@ -28,7 +28,8 @@ Dependencies:
 * npm >= 2.0.0
 
 ```bash
-cd url-to-wireframe && npm install
+$ cd url-to-wireframe
+$ npm install
 ```
 
 ## Usage
