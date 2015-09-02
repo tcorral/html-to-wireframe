@@ -2,7 +2,8 @@
 url-to-wireframe was created as a easy-to-use tool to generate wireframes from local or remote html files to do 
 something like Facebook does so that the user can see the structure of your app before load the whole page.
 
-This tool uses [Wirify Bookmarklet|http://www.wirify.com/] to do almost all the job but it also relays in:
+This tool relays on:
+* Wirify Bookmarklet -> http://www.wirify.com/
 * PhantomJS -> https://www.npmjs.com/package/phantomjs
 * CasperJS -> https://www.npmjs.com/package/casperjs
 
