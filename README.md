@@ -3,8 +3,8 @@ url-to-wireframe was created as a easy-to-use tool to generate wireframes from l
 something like Facebook does so that the user can see the structure of your app before load the whole page.
 
 This tool uses [Wirify Bookmarklet|http://www.wirify.com/] to do almost all the job but it also relays in:
-* (PhantomJS|https://www.npmjs.com/package/phantomjs)
-* (CasperJS|https://www.npmjs.com/package/casperjs)
+* PhantomJS -> https://www.npmjs.com/package/phantomjs
+* CasperJS -> https://www.npmjs.com/package/casperjs
 
 To fetch all the viewport sizes available it also uses the JSON version of the database that you can find in 
 [viewportsizes.com|http://viewportsizes.com]
