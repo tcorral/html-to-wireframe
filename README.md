@@ -41,4 +41,10 @@ your wireframes in the screenshots folder.
 $ npm start --urls=http://url.com,http://other-url.com
 ```
 
-
+## Todo
+* Convert this tool to a command line tool
+* Convert this tool to be a npm module.
+* Add arguments to:
+** Only get a set of viewports
+** Change the path to save the images.
+** Change the name or prefix the image files.
