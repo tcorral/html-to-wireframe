@@ -7,8 +7,8 @@ This tool relays on:
 * PhantomJS -> https://www.npmjs.com/package/phantomjs
 * CasperJS -> https://www.npmjs.com/package/casperjs
 
-To fetch all the viewport sizes available it also uses the JSON version of the database that you can find in 
-[viewportsizes.com|http://viewportsizes.com]
+To fetch all the viewport sizes available it also uses the JSON version of the database that you can find in:
+* Viewportsizes.com -> http://viewportsizes.com
 
 The tool will generate a png image per each viewport size in 'lib/viewports/index.js' file in portrait and landscape 
 so you will get two images per device.
