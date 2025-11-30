@@ -1,17 +1,15 @@
 {
   "name": "html-to-wireframe",
-  "version": "1.0.0",
-  "description": "",
+  "version": "2.0.0",
+  "description": "Transforme des pages HTML en wireframes (PNG) via Puppeteer",
   "main": "index.js",
-  "dependencies": {
-    "checkcommand": "^1.1.0",
-    "npm": "^2.14.1",
-    "q": "^1.4.1"
-  },
   "scripts": {
     "start": "node index.js"
   },
-  "devDependencies": {},
-  "author": "Tomas Corral",
+  "dependencies": {
+    "puppeteer": "^21.0.0",
+    "yargs": "^17.7.2"
+  },
+  "author": "Tomás Corral (Updated)",
   "license": "MIT"
 }

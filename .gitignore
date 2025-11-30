@@ -1,1 +1,3 @@
-lib/urls/index.js
+node_modules/
+screenshots/
+.DS_Store

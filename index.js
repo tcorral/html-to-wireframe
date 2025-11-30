@@ -1,110 +1,112 @@
-var npm = require('npm');
-var checkcommand = require('checkcommand');
-var arrayToString = require('./lib/utils').arrayToString;
-var spawn = require('child_process').spawn;
-var Q = require('q');
-var fs = require('fs');
-var scripts = process.env.npm_config_scripts ? process.env.npm_config_scripts.split(',') : ['./lib/screenshots/index.js'];
-var urls = process.env.npm_config_urls.split(',');
+const puppeteer = require('puppeteer');
+const fs = require('fs');
+const path = require('path');
+const yargs = require('yargs/yargs');
+const { hideBin } = require('yargs/helpers');
+const viewports = require('./lib/viewports/index');
 
-function installCasper() {
-  var deferred = Q.defer();
-  var spawn = require('child_process').spawn,
-    install;
-  checkcommand.ensure('casperjs', 'CasperJS does not exist in your system but we will install it for you.')
-    .then(function(){
-      console.log('CasperJS is already installed in your system.');
-      deferred.resolve(0);
+// Configuration des arguments (ex: npm start -- --urls="http://google.com")
+const argv = yargs(hideBin(process.argv))
+    .option('urls', {
+        alias: 'u',
+        type: 'string',
+        description: 'Liste des URLs séparées par des virgules',
+        demandOption: true
     })
-    .catch(function (error){
-      install = spawn('npm', ['install', '-g', 'casperjs@1.1.0-beta3']);
-      console.log('installing casperjs');
+    .parse();
 
-      install.stdout.on('data', function (data) {
-        console.log(data.toString());
-        deferred.notify(data);
-      });
+const urls = argv.urls.split(',').map(u => u.trim());
 
-      install.stderr.on('data', function (data) {
-        console.log(data.toString());
-      });
+// Chemin vers le script Wirify existant
+const WIRIFY_SCRIPT_PATH = path.join(__dirname, 'lib/wirify/index.js');
 
-      install.on('exit', function (code) {
-        console.log('child process exited with code ' + code);
-        deferred.resolve(code);
-      });
+(async () => {
+    // Lancement du navigateur
+    const browser = await puppeteer.launch({
+        headless: "new",
+        args: ['--no-sandbox', '--disable-setuid-sandbox']
     });
 
-  return deferred.promise;
-}
+    try {
+        for (const url of urls) {
+            console.log(`\n🚀 Traitement de l'URL : ${url}`);
+            
+            // Création d'un dossier pour l'URL
+            const urlFolder = url.replace(/[^a-z0-9]/gi, '_').toLowerCase();
+            const savePath = path.join(__dirname, 'screenshots', urlFolder);
+            if (!fs.existsSync(savePath)) {
+                fs.mkdirSync(savePath, { recursive: true });
+            }
 
-function installPhantom() {
-  var deferred = Q.defer();
-  var spawn = require('child_process').spawn,
-    install;
-  checkcommand.ensure('phantomjs', 'PhantomJS does not exist in your system but we will install it for you.')
-    .then(function(){
-      console.log('PhantomJS is already installed in your system.');
-      deferred.resolve(0);
-    })
-    .catch(function (error){
-      install = spawn('npm', ['install', '-g', 'phantomjs']);
-      console.log('installing phantomjs');
+            const page = await browser.newPage();
 
-      install.stdout.on('data', function (data) {
-        console.log(data.toString());
-        deferred.notify(data);
-      });
+            // On va sur la page
+            try {
+                await page.goto(url, { waitUntil: 'networkidle0', timeout: 60000 });
+            } catch (e) {
+                console.error(`❌ Erreur lors du chargement de ${url}:`, e.message);
+                await page.close();
+                continue;
+            }
 
-      install.stderr.on('data', function (data) {
-        console.log(data.toString());
-      });
+            // Injection de jQuery
+            await page.addScriptTag({ url: 'https://code.jquery.com/jquery-3.6.0.min.js' });
+            
+            // Injection du script Wirify local
+            await page.addScriptTag({ path: WIRIFY_SCRIPT_PATH });
 
-      install.on('exit', function (code) {
-        console.log('child process exited with code ' + code);
-        deferred.resolve(code);
-      });
-    });
+            // On déclenche Wirify
+            await page.evaluate(() => {
+                if (typeof wf_wirify !== 'undefined') {
+                    wf_wirify();
+                }
+            });
 
-  return deferred.promise;
-}
+            // Attendre que l'overlay apparaisse
+            try {
+                await page.waitForSelector('#wirify', { timeout: 10000 });
+            } catch (e) {
+                console.warn("⚠️ Wirify semble avoir pris du temps ou échoué, on continue...");
+            }
 
-function executeScripts() {
-  var promises = [];
-  scripts.forEach(function (file){
-    var deferred = Q.defer(),
-      spawn = require('child_process').spawn,
-      install    = spawn('casperjs', [file]);
-    console.log('executing script ' + file);
+            // Nettoyage de l'interface avant capture
+            await page.evaluate(() => {
+                const info = document.getElementById('wf-info');
+                const watermark = document.getElementById('wf-watermark');
+                if (info) info.style.display = 'none';
+                if (watermark) watermark.style.display = 'none';
+            });
 
-    install.stdout.on('data', function (data) {
-      console.log(data.toString());
-      deferred.notify(data);
-    });
+            // Boucle sur les viewports
+            for (const vp of viewports) {
+                const pWidth = parseInt(vp["Portrait Width"], 10);
+                const lWidth = parseInt(vp["Landscape Width"], 10);
 
-    install.stderr.on('data', function (data) {
-      console.log(data.toString());
-    });
+                if (isNaN(pWidth) || isNaN(lWidth)) continue;
 
-    install.on('exit', function (code) {
-      console.log('child process exited with code ' + code);
-      deferred.resolve(code);
-    });
-    promises.push(deferred.promise);
-  });
-  return Q.all(promises);
-}
+                // --- Capture PORTRAIT ---
+                await page.setViewport({ width: pWidth, height: lWidth });
+                await new Promise(r => setTimeout(r, 500));
+                
+                let filename = `${vp["Device Name"]}-Portrait-${pWidth}x${lWidth}.png`.replace(/[^a-z0-9\-\.]/gi, '_');
+                await page.screenshot({ path: path.join(savePath, filename), fullPage: true });
+                console.log(`📸 Capture : ${filename}`);
 
-fs.writeFile('./lib/urls/index.js', 'module.exports = '+ arrayToString(urls), function () {
-  installPhantom()
-    .then(function () {
-      installCasper()
-        .then(function(){
-          executeScripts()
-            .then(function (){
-              console.log('done');
-            })
-            .done();
-        });
-    });
-});
+                // --- Capture PAYSAGE ---
+                await page.setViewport({ width: lWidth, height: pWidth });
+                await new Promise(r => setTimeout(r, 500));
+
+                filename = `${vp["Device Name"]}-Landscape-${lWidth}x${pWidth}.png`.replace(/[^a-z0-9\-\.]/gi, '_');
+                await page.screenshot({ path: path.join(savePath, filename), fullPage: true });
+                console.log(`📸 Capture : ${filename}`);
+            }
+
+            await page.close();
+        }
+    } catch (error) {
+        console.error("Erreur globale:", error);
+    } finally {
+        await browser.close();
+        console.log('\n✅ Terminé.');
+    }
+})();
