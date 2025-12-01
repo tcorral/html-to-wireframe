@@ -2,6 +2,8 @@
 
 A lightweight tool to generate wireframes from local or remote HTML files. This tool creates visual wireframes similar to Facebook's loading skeleton screens, allowing users to see the structure of your app before the full page loads.
 
+![HTML to Wireframe](assets/html-to-wireframe.jpg)
+
 ## Features
 
 - Generate wireframe screenshots for multiple device viewport sizes

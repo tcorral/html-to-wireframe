@@ -5,6 +5,7 @@
   "main": "index.js",
   "dependencies": {
     "checkcommand": "^1.1.0",
+    "jimp": "^1.6.0",
     "npm": "^2.14.1",
     "playwright": "^1.40.0",
     "q": "^1.4.1"
