@@ -1,17 +1,17 @@
 {
   "name": "html-to-wireframe",
-  "version": "1.0.1",
-  "description": "",
+  "version": "2.0.0",
+  "description": "A lightweight tool to generate wireframes from local or remote html files",
   "main": "index.js",
   "dependencies": {
     "checkcommand": "^1.1.0",
     "npm": "^2.14.1",
+    "playwright": "^1.40.0",
     "q": "^1.4.1"
   },
   "scripts": {
     "start": "node index.js"
   },
-  "devDependencies": {},
   "author": "Tomas Corral",
   "license": "MIT"
 }

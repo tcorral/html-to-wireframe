@@ -4,8 +4,7 @@ something like Facebook does so that the user can see the structure of your app 
 
 This tool relays on:
 * Wirify Bookmarklet -> http://www.wirify.com/
-* PhantomJS -> https://www.npmjs.com/package/phantomjs
-* CasperJS -> https://www.npmjs.com/package/casperjs
+* Playwright -> https://playwright.dev/ (modern replacement for PhantomJS/CasperJS)
 
 To fetch all the viewport sizes available it also uses the JSON version of the database that you can find in:
 * Viewportsizes.com -> http://viewportsizes.com
