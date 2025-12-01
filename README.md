@@ -38,7 +38,7 @@ The usage is very simple, html-to-wireframe uses npm to running it, just execute
 your wireframes in the screenshots folder.
 
 ```bash
-$ npm start --urls=http://url.com,http://other-url.com
+$ npm start -- --urls="http://url.com,http://other-url.com"
 ```
 
 ## Todo

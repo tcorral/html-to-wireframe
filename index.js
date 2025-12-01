@@ -4,8 +4,24 @@ var arrayToString = require('./lib/utils').arrayToString;
 var spawn = require('child_process').spawn;
 var Q = require('q');
 var fs = require('fs');
-var scripts = process.env.npm_config_scripts ? process.env.npm_config_scripts.split(',') : ['./lib/screenshots/index.js'];
-var urls = process.env.npm_config_urls.split(',');
+
+// Parse command line arguments
+function parseArgs() {
+  var args = {};
+  process.argv.slice(2).forEach(function(arg) {
+    if (arg.indexOf('--') === 0) {
+      var parts = arg.substring(2).split('=');
+      if (parts.length === 2) {
+        args[parts[0]] = parts[1];
+      }
+    }
+  });
+  return args;
+}
+
+var parsedArgs = parseArgs();
+var scripts = parsedArgs.scripts ? parsedArgs.scripts.split(',') : ['./lib/screenshots/index.js'];
+var urls = parsedArgs.urls ? parsedArgs.urls.split(',') : [];
 
 function installCasper() {
   var deferred = Q.defer();
